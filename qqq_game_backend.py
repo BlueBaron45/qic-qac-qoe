@@ -15,5 +15,4 @@ def simple_ttt_game():
     results = []
     for bit, count in counts.items():
         results.extend([int(bit)] * count)
-
-    print(f"Game result: {results}")
+    return results

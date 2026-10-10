@@ -42,44 +42,11 @@ class TileType(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(
             center = [x,y]
             )
+    def changeType(self, newType):
+        self.type = newType
+        self.surf = pygame.image.load(newType).convert()
+        self.surf.set_colorkey((255,255,255),RLEACCEL)
 
 
-screen, clock = initWindow(800, 600)
-DARK_BLUE = (255, 255, 255)
-FPS = 60
-GRID_SIZE = 3
 
-tiles = []
-img = pygame.image.load(assetsDir / "assets/tile.png")
 
-for row in range(GRID_SIZE):
-    for column in range(GRID_SIZE):
-        tiles.append(
-            TileType(
-                100 + column * img.get_width(),
-                100 + row * img.get_height(),
-                TileTypeEnum.EMPTY.value,
-            )
-        )
-
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    #fill
-    screen.fill(DARK_BLUE)  # Fill background color
-
-    for tile in tiles:
-        screen.blit(tile.surf, tile.rect)
-
-        # Draw game elements here (e.g., pygame.draw.rect, images, etc.)
-
-        # Update display
-    pygame.display.flip()
-
-    clock.tick(FPS)
-
-pygame.quit()
-sys.exit()
