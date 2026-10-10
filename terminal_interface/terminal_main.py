@@ -8,7 +8,7 @@ def game_run(simulator):
     grid = QQQGrid(sizeOfGrid)
     found_winner = False
     moves_since_measurement = 0
-    measurement_interval = 3
+    measurement_interval = 6
     generator = qqq_functions.set_up_rng_circuit(sizeOfGrid)
     print_game(grid)
     active_player = 'X'
