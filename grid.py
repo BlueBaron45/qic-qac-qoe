@@ -1,20 +1,10 @@
 import enum
-import pygame
 from pathlib import Path
-from pygame.locals import(
-    K_ESCAPE,
-    QUIT,
-    MOUSEBUTTONUP,
-    MOUSEBUTTONDOWN,
-    RLEACCEL
-    )
-import sys
 
+import pyglet
 
 
 assetsDir = Path(__file__).resolve().parent
-file_path = assetsDir / "assets/tile.png"
-
 
 
 class TileTypeEnum(enum.Enum):
@@ -22,31 +12,36 @@ class TileTypeEnum(enum.Enum):
     CROSS = assetsDir / "assets/ex.png"
     EMPTY = assetsDir / "assets/tile.png"
 
-def initWindow(SCREEN_WIDTH, SCREEN_HEIGHT):
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Piškorky")
 
-    clock = pygame.time.Clock()
+def initWindow(screen_width, screen_height):
+    return pyglet.window.Window(
+        width=screen_width,
+        height=screen_height,
+        caption="Piškorky",
+    )
 
-    return screen, clock
 
-class TileType(pygame.sprite.Sprite):
-    def __init__(self, x, y, type):
-        super (TileType, self).__init__()
+class TileType:
+    def __init__(self, x, y, tile_type, window_height):
         self.x = x
         self.y = y
-        self.type = type
-        self.surf = pygame.image.load(type).convert()
-        self.surf.set_colorkey((255,255,255),RLEACCEL)
-        self.rect = self.surf.get_rect(
-            center = [x,y]
-            )
-    def changeType(self, newType):
-        self.type = newType
-        self.surf = pygame.image.load(newType).convert()
-        self.surf.set_colorkey((255,255,255),RLEACCEL)
+        self.type = tile_type
+        self.window_height = window_height
+        self.sprite = None
+        self._load_sprite()
 
+    def _load_sprite(self):
+        image = pyglet.image.load(str(self.type))
+        self.sprite = pyglet.sprite.Sprite(
+            image,
+            x=self.x,
+            y=self.window_height - self.y - image.height,
+        )
 
+    def changeType(self, new_type):
+        self.type = new_type
+        self.sprite.delete()
+        self._load_sprite()
 
-
+    def draw(self):
+        self.sprite.draw()
