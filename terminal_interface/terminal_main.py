@@ -19,18 +19,18 @@ def game_run(simulator):
         found_winner = grid.logic(to_win, active_player)
         print()
         print_game(grid)
-        if found_winner:
-            print(f"PLAYER {active_player} WINS")
-            break
-        if active_player == 'X':
-            active_player = 'O'
-        else:
-            active_player = 'X'
+        evaulate = measure_grid()
+        if evaulate == 'X':
+            print(f'winner: {evaulate}')
+        elif evaulate == 'Y':
+            print(f'winner: {evaulate}')
 
 def print_game(grid:QQQGrid):
     for row in grid.get_grid():
         line = ""
         for cell in row:
             line += str(cell.get_state())
-            line += " propability"
         print(line)
+
+def measure_grid():
+    return 'x'
