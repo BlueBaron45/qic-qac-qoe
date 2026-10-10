@@ -1,0 +1,19 @@
+
+pycache/ .py[cod] $py.class *.so
+
+Python build and distribution
+
+build/ dist/ *.egg-info/ .eggs/ wheels/ pip-wheel-metadata/
+
+.venv/ venv/ env/ ENV/
+.idea/ *.iml
+
+.pytest_cache/ .coverage .coverage.* htmlcov/ .tox/ .nox/ coverage.xml
+
+.ipynb_checkpoints/ *.nbconvert.ipynb
+.png .svg *.pdf
+.log .tmp .bak .swp *.swo .DS_Store Thumbs.db
+.env .env.* !.env.example
+local_settings.py
+
+.idea/
