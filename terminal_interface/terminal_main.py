@@ -1,5 +1,6 @@
 from qqq_backend import qqq_functions
 from qqq_backend.qqq_grid import QQQGrid
+from qqq_backend.qqq_block import QQQBlock 
 
 
 def game_run(simulator):
@@ -31,4 +32,5 @@ def print_game(grid:QQQGrid):
         line = ""
         for cell in row:
             line += str(cell.get_state())
+            line += " propability"
         print(line)
