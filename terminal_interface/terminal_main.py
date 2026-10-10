@@ -8,15 +8,13 @@ def game_run(simulator):
     grid = QQQGrid(sizeOfGrid)
     found_winner = False
     generator = qqq_functions.set_up_rng_circuit(sizeOfGrid)
-    active_player = 'X'
     print_game(grid)
+    active_player = 'X'
     while not found_winner:
-        move_made = False
-        while not move_made:
-            job = qqq_functions.generate_values_from_rng_circuit(generator, 2, simulator)
-            values = qqq_functions.binary_to_decimal(job)
-            move_made = grid.make_standard_move(values[0], values[1], active_player)
-        found_winner = grid.logic(sizeOfGrid, active_player)
+        job = qqq_functions.generate_values_from_rng_circuit(generator, 2, simulator)
+        values = qqq_functions.binary_to_decimal(job)
+        grid.make_standard_move(values[0], values[1], active_player)
+        found_winner = grid.logic(sizeOfGrid, simulator)
         print()
         print_game(grid)
         evaulate = measure_grid()
@@ -24,6 +22,10 @@ def game_run(simulator):
             print(f'winner: {evaulate}')
         elif evaulate == 'Y':
             print(f'winner: {evaulate}')
+        if (active_player == 'X'):
+            active_player = 'O'
+        else:
+            active_player = 'X'
 
 def print_game(grid:QQQGrid):
     for row in grid.get_grid():
