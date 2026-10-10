@@ -6,5 +6,5 @@ from terminal_interface.terminal_main import game_run
 
 #main method
 if __name__ == "__main__":
-    game_run()
+    game_run(3)
     
