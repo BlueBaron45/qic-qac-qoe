@@ -20,6 +20,39 @@ class QQQGrid:
         if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
             raise ValueError("winNum must be between 1 and the board size")
 
+        # Create a temporary grid containing measured cell states
+        temp_grid = []
+
+        for row in range(board_size):
+            temp_row = []
+
+            for column in range(board_size):
+                spot = self.grid[row][column]
+                character = spot.get_state()
+
+                if character == '?':
+                    tilt_a = spot.get_tiltA()
+                    tilt_b = spot.get_tiltB()
+                    total = tilt_a + tilt_b
+
+                    if total <= 0:
+                        raise ValueError(
+                            "The sum of tiltA and tiltB must be positive"
+                        )
+
+                    probability = tilt_a / total
+
+                    number = generate_parametrized_values_from_circuit(
+                        probability, simulator
+                    )
+
+                    character = 'X' if number == 0 else 'O'
+
+                temp_row.append(character)
+
+            temp_grid.append(temp_row)
+
+        # Check the temporary grid for a winner
         directions = (
             (0, 1),  # Horizontal
             (1, 0),  # Vertical
@@ -29,16 +62,9 @@ class QQQGrid:
 
         for row in range(board_size):
             for column in range(board_size):
-                spot = self.grid[row][column]
-                character = spot.get_state()
-                if character == '?':
-                    number = generate_parametrized_values_from_circuit(spot.get_tiltA() / (spot.get_tiltA() + spot.get_tiltB()), simulator)
-                    if number == 0 :
-                        character = 'X'
-                    else:
-                        character = 'O'
-                # Skip empty cells
-                if character not in ("X", "O"):
+                character = temp_grid[row][column]
+
+                if character not in ('X', 'O'):
                     continue
 
                 for row_step, column_step in directions:
@@ -52,11 +78,11 @@ class QQQGrid:
                         continue
 
                     if all(
-                            self.grid[
+                            temp_grid[
                                 row + step * row_step
                             ][
                                 column + step * column_step
-                            ].get_state() == character
+                            ] == character
                             for step in range(winNum)
                     ):
                         return character

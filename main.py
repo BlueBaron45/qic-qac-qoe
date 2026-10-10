@@ -1,3 +1,5 @@
+from qiskit import transpile
+
 from quantum_circuit_testing import test_circuit
 from quantum_evaluators import simple_pair_entangled_evaluator
 from terminal_interface.terminal_main import game_run
