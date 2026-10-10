@@ -1,8 +1,8 @@
 from qqq_game_backend import simple_ttt_game
 
 
-def game_run():
-    result = simple_ttt_game()
+def game_run(simulator):
+    result = simple_ttt_game(simulator)
     output_string = ""
     for i in range(1, len(result) + 1):
         if result[i - 1] == 1:
