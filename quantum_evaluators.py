@@ -33,15 +33,3 @@ def simple_pair_entangled_evaluator(are_same: bool = True) -> qiskit.QuantumCirc
     circuit.measure(0, 0)
     circuit.measure(1, 1)
     return circuit
-
-#for all be same, count has to be more than 2
-#there seems to be problems with values higher then 4
-def simple_multi_entangled_evaluator(input_qubit:int):
-    if input_qubit < 2:
-        raise ValueError("input_qubit must be greater than 2")
-    circuit = QuantumCircuit(input_qubit + 1,input_qubit + 1)
-    for i in range(input_qubit):
-        circuit.h(i)
-    circuit.mcx(list(range(input_qubit)), input_qubit)
-    circuit.measure(list(range(input_qubit + 1)), list(range(input_qubit + 1)))
-    return circuit

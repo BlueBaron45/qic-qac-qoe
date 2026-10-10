@@ -18,3 +18,4 @@ local_settings.py
 
 .idea/
 .__pycache__/
+.terminal_interface/__pycache__/
