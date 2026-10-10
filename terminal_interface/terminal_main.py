@@ -38,8 +38,12 @@ def print_game(grid:QQQGrid):
                 line += "--------" # a/(a+b)
                 line += "--------" # b/(b+a)
             else:
-                line += " |" + str("%") + " X: " + str(1 - cell.tiltA)
-                line += " |" + str("%") + " O: " + str(cell.get_tiltA())
+                probA = str(cell.get_tiltA()/(cell.get_tiltA() + cell.get_tiltB()))
+                hlavna_cast, desatinnu_cast = probA.split(".")
+                probB = str(cell.get_tiltB()/(cell.get_tiltA() + cell.get_tiltB()))
+                hlavna_cast_B, desatinnu_cast_B = probB.split(".")
+                line += " |" + str("%") + " X: " + hlavna_cast + "." + desatinnu_cast
+                line += " |" + str("%") + " O: " + hlavna_cast_B + "." + desatinnu_cast_B
         print(line)
 
 def measure_grid():
