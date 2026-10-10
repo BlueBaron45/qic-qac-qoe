@@ -33,8 +33,8 @@ def print_game(grid:QQQGrid):
         for cell in row:
             line += " |" +str(cell.get_state())
             if cell.get_state() == "-":
-                line += "--------"
-                line += "--------"
+                line += "--------" # a/(a+b)
+                line += "--------" # b/(b+a)
             else:
                 line += " |" + str("%") + " X: " + str(1 - cell.tiltA)
                 line += " |" + str("%") + " O: " + str(cell.get_tiltA())

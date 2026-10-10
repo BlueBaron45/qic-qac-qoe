@@ -1,6 +1,6 @@
 from qiskit import QuantumCircuit
 import matplotlib.pyplot as plt
-from qiskit.visualization import plot_histogramё
+from qiskit.visualization import plot_histogram
 from qiskit.providers.jobstatus import JobStatus
 import time
 
