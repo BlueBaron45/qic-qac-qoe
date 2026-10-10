@@ -9,5 +9,4 @@ from qiskit_aer import AerSimulator
 if __name__ == "__main__":
     simulator = AerSimulator()
     game_run(simulator)
-    test_circuit(simulator=simulator, circuit=simple_pair_entangled_evaluator(False))
     
