@@ -10,7 +10,8 @@ assetsDir = Path(__file__).resolve().parent
 class TileTypeEnum(enum.Enum):
     CIRCLE = assetsDir / "assets/circle.png"
     CROSS = assetsDir / "assets/ex.png"
-    EMPTY = assetsDir / "assets/tile.png"
+    EMPTY = assetsDir / "assets/emptyTile.png"
+    OUTLINE = assetsDir / "assets/outline.png"
 
 
 def initWindow(screen_width, screen_height):

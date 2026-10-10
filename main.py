@@ -9,6 +9,7 @@ def gameRun():
     GRID_SIZE = 3
 
     tiles = []
+    fixedGrid = []
     image = pyglet.image.load(str(grid.TileTypeEnum.EMPTY.value))
 
     for row in range(GRID_SIZE):
@@ -21,10 +22,19 @@ def gameRun():
                     window.height,
                 )
             )
+            fixedGrid.append(
+                grid.TileType(
+                    100 + column * image.width,
+                    100 + row * image.height,
+                    grid.TileTypeEnum.OUTLINE.value,
+                    window.height,
+                )
+            )
 
     result = simple_ttt_game()
+    
     for tile in tiles:
-        tile.changeType(grid.TileTypeEnum.CROSS.value)
+        tile.changeType(grid.TileTypeEnum.EMPTY.value)
 
     background = pyglet.shapes.Rectangle(
         0, 0, window.width, window.height, color=(255, 255, 255)
