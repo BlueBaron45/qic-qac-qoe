@@ -4,7 +4,7 @@ import numpy
 from quantum_evaluators import *
 
 def simple_ttt_game(simulator, grid_size:int):
-    evaluator = simple_evaulator()
+    evaluator = simple_evaluator()
     result = simulator.run(evaluator, shots=grid_size * grid_size, memory=True).result()
     # Get individual measurement results
     results = result.get_memory()

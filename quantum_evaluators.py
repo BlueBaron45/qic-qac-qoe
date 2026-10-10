@@ -4,7 +4,7 @@ import qiskit
 from qiskit import QuantumCircuit
 
 #simple evaluator that can take the wanted probability of 0 as input
-def simple_evaulator() -> qiskit.QuantumCircuit:
+def simple_evaluator() -> qiskit.QuantumCircuit:
     circuit = QuantumCircuit(1, 1)
     circuit.h(0)
     circuit.measure(0, 0)
@@ -13,7 +13,7 @@ def simple_evaulator() -> qiskit.QuantumCircuit:
 
 #value has to be between 0 and 1
 #some values are not recommended to use here, such as: 0, 1, 0.5 (for this one just use simple_evaluator function)
-def simple_paramitrized_evaluator(chance_for_0: float = 0.5) -> qiskit.QuantumCircuit:
+def simple_parametrized_evaluator(chance_for_0: float = 0.5) -> qiskit.QuantumCircuit:
     if not (0 <= chance_for_0 <= 1):
         raise ValueError("x must be between 0 and 1 for valid quantum probabilities.")
     theta = 2 * np.arccos(np.sqrt(chance_for_0))

@@ -1,4 +1,7 @@
 from qqq_backend.qqq_block import QQQBlock
+from quantum_evaluators import simple_parametrized_evaluator
+
+
 class QQQGrid:
 
     def __init__(self, size: int):
@@ -13,14 +16,11 @@ class QQQGrid:
         self.grid[x][y].set_state(player)
         return True
 
-    def logic(self, winNum: int, character: str) -> bool:
+    def logic(self, winNum: int):
         board_size = len(self.grid)
 
         if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
             raise ValueError("winNum must be between 1 and the board size")
-
-        if character not in ("X", "O", " "):
-            raise ValueError("character must be 'X' or 'O'")
 
         directions = (
             (0, 1),  # Horizontal
@@ -31,9 +31,14 @@ class QQQGrid:
 
         for row in range(board_size):
             for column in range(board_size):
-                cell = self.grid[row][column].get_state()
+                spot = self.grid[row][column]
+                character = spot.get_state()
+                if character == '?':
+                    parameter_circuit = simple_parametrized_evaluator()
+                    #TODO
 
-                if cell != character:
+                # Skip empty cells
+                if character not in ("X", "O"):
                     continue
 
                 for row_step, column_step in directions:
@@ -54,6 +59,6 @@ class QQQGrid:
                             ].get_state() == character
                             for step in range(winNum)
                     ):
-                        return True
+                        return character
 
-        return False
+        return None
