@@ -30,6 +30,10 @@ def print_game(grid:QQQGrid):
         line = ""
         for cell in row:
             line += str(cell.get_state())
+        for cell in row:
+            line += " |" +str(cell.get_state())
+            line += " X: " + str(cell.tiltA)
+            line += " propability of O: " + str(1 - cell.tiltA)
         print(line)
 
 def measure_grid():
