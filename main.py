@@ -2,7 +2,7 @@ from qqq_game_backend import simple_ttt_game
 from quantum_circuit_testing import test_circuit
 from quantum_evaluators import simple_paramitrized_evaluator
 import grid
-import pygame
+import pipygame
 from pygame.locals import(
     K_ESCAPE,
     QUIT,
