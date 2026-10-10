@@ -13,6 +13,7 @@ class QQQGrid:
 
     def make_standard_move(self, x: int, y: int, player) -> bool:
         self.grid[x][y].direct_add(player)
+        return True
 
     def logic(self, winNum: int, simulator):
         board_size = len(self.grid)

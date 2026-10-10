@@ -16,8 +16,8 @@ def game_run(simulator):
             job = qqq_functions.generate_values_from_rng_circuit(generator, 2, simulator)
             values = qqq_functions.binary_to_decimal(job)
             move_made = grid.make_standard_move(values[0], values[1], active_player)
-        found_winner = grid.logic(sizeOfGrid, active_player)
-        print()
+        found_winner = grid.logic(sizeOfGrid, simulator)
+        print("\n" * 4)
         print_game(grid)
         evaulate = measure_grid()
         if evaulate == 'X':
@@ -29,11 +29,19 @@ def game_run(simulator):
         else:
             active_player = 'X'
 
+
 def print_game(grid:QQQGrid):
-    cell_width = 13
+    cell_width = 15
     symbol_art = {
         "X": ("X   X", " X X ", "  X  ", " X X ", "X   X"),
-        "O": ("  .---.  ", " /     \\ ", "|       |", " \\     / ", "  '---'  "),
+        "O": (
+            "  .---.  ",
+            " /     \\ ",
+            "|       |",
+            "|       |",
+            " \\     / ",
+            "  '---'  ",
+        ),
         "-": ("     ", "     ", "     ", "     ", "     "),
     }
     rows = grid.get_grid()
@@ -41,16 +49,42 @@ def print_game(grid:QQQGrid):
     for row_index, row in enumerate(rows):
         rendered_cells = []
         for cell in row:
-            line += str(cell.get_state())
-        for cell in row:
-            line += " |" +str(cell.get_state())
-            if cell.get_state() == "-":
-                line += "--------"
-                line += "--------"
+            state = cell.get_state()
+            tilt_x = cell.get_tiltA()
+            tilt_o = cell.get_tiltB()
+            total_tilts = tilt_x + tilt_o
+
+            if total_tilts > 0:
+                chance_x = round(100 * tilt_x / total_tilts)
+                chance_o = 100 - chance_x
+                is_uncertain = tilt_x > 0 and tilt_o > 0
+                if not is_uncertain:
+                    state = "X" if tilt_x > 0 else "O"
+                chances = (
+                    f"X: {chance_x:3d}%",
+                    f"O: {chance_o:3d}%",
+                )
             else:
-                line += " |" + str("%") + " X: " + str(1 - cell.tiltA)
-                line += " |" + str("%") + " O: " + str(cell.get_tiltA())
-        print(line)
+                chances = ("X:  --", "O:  --")
+                is_uncertain = False
+
+            if is_uncertain:
+                art = ("#" * cell_width,) * 6
+            else:
+                art = symbol_art.get(state, symbol_art["-"])
+            art = art + ("",) * (6 - len(art))
+
+            rendered_cells.append(
+                [line.center(cell_width) for line in art]
+                + [line.center(cell_width) for line in chances]
+            )
+
+        cell_height = max(len(cell) for cell in rendered_cells)
+        for line_index in range(cell_height):
+            print(" | ".join(cell[line_index] for cell in rendered_cells))
+
+        if row_index < len(rows) - 1:
+            print("-+-".join("-" * cell_width for _ in row))
 
 def measure_grid():
     return 'x'
