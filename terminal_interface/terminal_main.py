@@ -7,7 +7,8 @@ def game_run(simulator, gridSize):
     tiles = ["-", "X", "O"]
     result = simple_ttt_game(simulator, gridSize)
     grid = []
-    #for i in range()
+    for i in range(gridSize**2):
+        pass
     
     testGrid = [0, 0, 0, 0, " ", " ", 1, 1, " "]
     game_state = result
@@ -70,4 +71,5 @@ def logic(game_state, winNum, character):
 def move(placeOnGrid, gridSize):
     if placeOnGrid >= gridSize-1 or placeOnGrid <= 0:
         ValueError("placeOnGrid must be between: 0-", gridSize-1)
+    
     
