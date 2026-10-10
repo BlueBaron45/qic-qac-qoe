@@ -5,11 +5,12 @@ from qqq_backend.qqq_grid import simple_ttt_game
 
 def game_run(simulator):
     tiles = ["-", "X", "O"]
-    result = simple_ttt_game(simulator)
+    result = simple_ttt_game(simulator, 3)
+    testGrid = [0, 0, 0, 0, " ", " ", 1, 1, 1]
     game_state = result
     output_string = ""
     i = 1
-    for tile in result:
+    for tile in testGrid:
         if tile == 1:
             output_string += tiles[1]
         elif tile == 0:
@@ -19,7 +20,7 @@ def game_run(simulator):
         if i % 3 == 0:
             output_string += '\n'
         i += 1
-    print(logic(result, 3, 'O'))
+    print(logic(testGrid, 3, 'O'))
     print(output_string)
     
     
@@ -29,9 +30,9 @@ def logic(game_state, winNum, character):
         raise ValueError("game_state must contain a square board")
     if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
         raise ValueError("winNum must be between 1 and the board size")
-    if character not in ("X", "O"):
+    if character not in ("X", "O", " "):
         raise ValueError("character must be 'X' or 'O'")
-    if any(cell not in (0, 1) for cell in game_state):
+    if any(cell not in (0, 1, " ") for cell in game_state):
         raise ValueError("game_state cells must be 0 or 1")
 
     target_cell = 1 if character == "X" else 0
