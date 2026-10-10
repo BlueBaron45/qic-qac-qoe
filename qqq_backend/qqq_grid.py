@@ -12,10 +12,7 @@ class QQQGrid:
         return self.grid
 
     def make_standard_move(self, x: int, y: int, player) -> bool:
-        if self.grid[x][y].get_state() != '-':
-            return False
-        self.grid[x][y].set_state(player)
-        return True
+        self.grid[x][y].direct_add(player)
 
     def logic(self, winNum: int, simulator):
         board_size = len(self.grid)
