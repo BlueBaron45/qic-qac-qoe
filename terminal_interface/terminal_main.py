@@ -8,13 +8,15 @@ def game_run(simulator, gridSize):
     result = simple_ttt_game(simulator, gridSize)
     grid = []
     for i in range(gridSize**2):
-        pass
+        grid.append(" ")
+    
+    move(0, grid, 0)
     
     testGrid = [0, 0, 0, 0, " ", " ", 1, 1, " "]
     game_state = result
     output_string = ""
     i = 1
-    for tile in testGrid:
+    for tile in grid:
         if tile == 1:
             output_string += tiles[1]
         elif tile == 0:
@@ -24,7 +26,7 @@ def game_run(simulator, gridSize):
         if i % gridSize == 0:
             output_string += '\n'
         i += 1
-    print(logic(testGrid, 3, 'O'))
+    print(logic(grid, 3, 'O'))
     print(output_string)
     
     
@@ -68,8 +70,13 @@ def logic(game_state, winNum, character):
 
     return False
 
-def move(placeOnGrid, gridSize):
-    if placeOnGrid >= gridSize-1 or placeOnGrid <= 0:
-        ValueError("placeOnGrid must be between: 0-", gridSize-1)
+def move(placeOnGrid, grid, tileType):
+    if placeOnGrid >= len(grid)-1 or placeOnGrid <= 0:
+        ValueError("placeOnGrid must be between: 0-", len(grid)-1)
+    if not (tileType == 0 or tileType == 1):
+        ValueError("tiletype must be 1 or 0")
+    grid[placeOnGrid] = tileType    
+    
+    
     
     
