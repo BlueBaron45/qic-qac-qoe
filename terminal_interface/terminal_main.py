@@ -4,7 +4,8 @@ from qqq_backend.qqq_grid import simple_ttt_game
 
 
 def game_run(simulator):
-    result = simple_ttt_game(simulator)
+    grid_size = 9
+    result = simple_ttt_game(simulator, grid_size)
     game_state = result
     output_string = ""
     for i in range(1, len(result) + 1):
@@ -12,9 +13,9 @@ def game_run(simulator):
             output_string += 'X'
         else :
             output_string += 'O'
-        if i % 3 == 0:
+        if i % grid_size == 0:
             output_string += '\n'
-    print(logic(result, 3))
+    print(logic(result, 2))
     print(output_string)
     
 def logic(game_state, winNum):
