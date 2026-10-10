@@ -5,7 +5,7 @@ from qqq_backend.qqq_grid import simple_ttt_game
 
 def game_run(simulator, gridSize):
     tiles = ["-", "X", "O"]
-    result = simple_ttt_game(simulator, grid_size)
+    result = simple_ttt_game(simulator, gridSize)
     grid = []
     for i in range(gridSize**2):
         pass
@@ -71,4 +71,5 @@ def logic(game_state, winNum, character):
 def move(placeOnGrid, gridSize):
     if placeOnGrid >= gridSize-1 or placeOnGrid <= 0:
         ValueError("placeOnGrid must be between: 0-", gridSize-1)
+    
     
