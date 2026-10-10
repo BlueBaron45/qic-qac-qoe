@@ -1,3 +1,6 @@
 1. urcit mozne akcie hraca
 2. aplikovat akcie hraca
 3. vytvorit evaluatorov
+4. aplikovat pohyb hyperpozicii
+5. upravit main loop aby mohol sa prepisovat 
+6. vypis pravdepodobnostej na gride 
