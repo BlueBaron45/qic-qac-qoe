@@ -1,12 +1,10 @@
 # simulates a simple ttt game without any player input
-from qiskit_aer import AerSimulator
 
 from quantum_evaluators import *
 
 
-def simple_ttt_game():
+def simple_ttt_game(simulator):
     evaluator = simple_evaulator()
-    simulator = AerSimulator()
     result = simulator.run(evaluator, shots=9).result()
     # Get measurement counts
     counts = result.get_counts()
