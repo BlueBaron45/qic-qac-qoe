@@ -4,15 +4,8 @@ class QQQGrid:
     def __init__(self, size: int):
         self.grid = [[QQQBlock() for _ in range(size)] for _ in range(size)]
 
-<<<<<<< HEAD
-
-def simple_ttt_game(simulator, grid_size:int):
-    evaluator = simple_evaulator()
-    result = simulator.run(evaluator, shots=grid_size * grid_size, memory=True).result()
-=======
     def get_grid(self):
         return self.grid
->>>>>>> aa2c145afb0678393afcf76cd51652eb22347aeb
 
     def make_standard_move(self, x: int, y: int, player) -> bool:
         if self.grid[x][y].get_state() != '-':
