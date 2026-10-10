@@ -7,7 +7,8 @@ def game_run(simulator, gridSize):
     tiles = ["-", "X", "O"]
     result = simple_ttt_game(simulator, grid_size)
     grid = []
-    #for i in range()
+    for i in range(gridSize**2):
+        pass
     
     testGrid = [0, 0, 0, 0, " ", " ", 1, 1, " "]
     game_state = result
