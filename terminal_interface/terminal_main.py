@@ -3,10 +3,13 @@ from math import isqrt
 from qqq_backend.qqq_grid import simple_ttt_game
 
 
-def game_run(simulator):
+def game_run(simulator, gridSize):
     tiles = ["-", "X", "O"]
-    result = simple_ttt_game(simulator, 3)
-    testGrid = [0, 0, 0, 0, " ", " ", 1, 1, 1]
+    result = simple_ttt_game(simulator, grid_size)
+    grid = []
+    #for i in range()
+    
+    testGrid = [0, 0, 0, 0, " ", " ", 1, 1, " "]
     game_state = result
     output_string = ""
     i = 1
@@ -17,7 +20,7 @@ def game_run(simulator):
             output_string += tiles[2]
         else:
             output_string += tiles[0]
-        if i % 3 == 0:
+        if i % gridSize == 0:
             output_string += '\n'
         i += 1
     print(logic(testGrid, 3, 'O'))
@@ -63,3 +66,8 @@ def logic(game_state, winNum, character):
                     return True
 
     return False
+
+def move(placeOnGrid, gridSize):
+    if placeOnGrid >= gridSize-1 or placeOnGrid <= 0:
+        ValueError("placeOnGrid must be between: 0-", gridSize-1)
+    

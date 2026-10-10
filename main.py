@@ -8,6 +8,6 @@ from qiskit_aer import AerSimulator
 #main method
 if __name__ == "__main__":
     simulator = AerSimulator()
-    game_run(simulator)
+    game_run(simulator, 3)
     #test_circuit(circuit=simple_multi_entangled_evaluator(5), simulator=simulator)
     
