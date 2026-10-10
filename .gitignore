@@ -17,3 +17,4 @@ build/ dist/ *.egg-info/ .eggs/ wheels/ pip-wheel-metadata/
 local_settings.py
 
 .idea/
+.__pycache__/
