@@ -1,14 +1,18 @@
 from qqq_backend import qqq_functions
 from qqq_backend.qqq_grid import QQQGrid
 from qqq_backend.qqq_block import QQQBlock 
+import time
 
-sizeOfGrid = 3
+sizeOfGrid = 4
+
 
 def game_run(simulator):
+    move_count = 0
     grid = QQQGrid(sizeOfGrid)
     found_winner = False
     moves_since_measurement = 0
-    measurement_interval = 3
+    # interval for measuring the grid, after this many moves the grid will be measured and a winner will be checked
+    measurement_interval = 5
     generator = qqq_functions.set_up_rng_circuit(sizeOfGrid)
     print_game(grid)
     active_player = 'X'
@@ -24,6 +28,8 @@ def game_run(simulator):
             moves_since_measurement = 0
         print("\n" * 4)
         print_game(grid)
+        move_count +=1
+        print("move: ", move_count)
         if found_winner == 'X':
             print(f'winner: {found_winner}')
         elif found_winner == 'O':
@@ -31,6 +37,7 @@ def game_run(simulator):
 
         if not found_winner:
             active_player = 'O' if active_player == 'X' else 'X'
+        time.sleep(1)  # Pause for a second before the next move
 
 
 def print_game(grid: QQQGrid):
