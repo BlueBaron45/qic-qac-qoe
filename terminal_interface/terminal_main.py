@@ -19,11 +19,11 @@ def game_run(simulator):
         found_winner = grid.logic(sizeOfGrid, simulator)
         print("\n" * 4)
         print_game(grid)
-        evaulate = measure_grid()
-        if evaulate == 'X':
-            print(f'winner: {evaulate}')
-        elif evaulate == 'Y':
-            print(f'winner: {evaulate}')
+        if found_winner == 'X':
+            print(f'winner: {found_winner}')
+        elif found_winner == 'O':
+            print(f'winner: {found_winner}')
+
         if (active_player == 'X'):
             active_player = 'O'
         else:
@@ -85,6 +85,3 @@ def print_game(grid:QQQGrid):
 
         if row_index < len(rows) - 1:
             print("-+-".join("-" * cell_width for _ in row))
-
-def measure_grid():
-    return 'x'
