@@ -1,13 +1,13 @@
-from qqq_backend import qqq_functions
 from quantum_circuit_testing import test_circuit
+from quantum_evaluators import simple_pair_entangled_evaluator
+from terminal_interface.terminal_main import game_run
 
 #toto nejde do qollab
 from qiskit_aer import AerSimulator
-
-from terminal_interface.terminal_main import game_run
 
 #main method
 if __name__ == "__main__":
     simulator = AerSimulator()
     game_run(simulator)
-    #test_circuit(circuit = qqq_grid.set_up_rng_circuit(7), simulator = simulator)
+    #test_circuit(simulator=simulator, circuit=simple_pair_entangled_evaluator(False))
+    
