@@ -1,5 +1,6 @@
 from qqq_backend import qqq_functions
 from qqq_backend.qqq_grid import QQQGrid
+from qqq_backend.qqq_block import QQQBlock 
 
 sizeOfGrid = 3
 
@@ -18,17 +19,22 @@ def game_run(simulator):
         found_winner = grid.logic(sizeOfGrid, active_player)
         print()
         print_game(grid)
-        if found_winner:
-            print(f"PLAYER {active_player} WINS")
-            break
-        if active_player == 'X':
-            active_player = 'O'
-        else:
-            active_player = 'X'
+        evaulate = measure_grid()
+        if evaulate == 'X':
+            print(f'winner: {evaulate}')
+        elif evaulate == 'Y':
+            print(f'winner: {evaulate}')
 
 def print_game(grid:QQQGrid):
     for row in grid.get_grid():
         line = ""
         for cell in row:
             line += str(cell.get_state())
+        for cell in row:
+            line += " |" +str(cell.get_state())
+            line += " X: " + str(cell.tiltA)
+            line += " propability of O: " + str(1 - cell.tiltA)
         print(line)
+
+def measure_grid():
+    return 'x'
