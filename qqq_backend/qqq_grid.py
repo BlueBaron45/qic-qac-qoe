@@ -2,14 +2,13 @@
 
 from quantum_evaluators import *
 
-def simple_ttt_game(simulator):
+def simple_ttt_game(simulator, grid_size:int):
     evaluator = simple_evaulator()
-    result = simulator.run(evaluator, shots=9).result()
+    result = simulator.run(evaluator, shots=grid_size * grid_size, memory=True).result()
     # Get measurement counts
-    counts = result.get_counts()
+    counts = result.get_memory()
 
-    # Convert counts into an array of individual results
-    results = []
-    for bit, count in counts.items():
-        results.extend([int(bit)] * count)
-    return results
+    # Get individual measurement results
+    results = result.get_memory()
+
+    return [int(bit) for bit in results]

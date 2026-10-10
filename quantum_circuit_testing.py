@@ -4,7 +4,7 @@ from qiskit.visualization import plot_histogram
 from qiskit.providers.jobstatus import JobStatus
 import time
 
-#default circuit used for testing and debug purpouses
+#default circuit used for testing and debug purposes
 def generate_default_circuit():
     circuit = QuantumCircuit(2, 2)  # 2 qubits, 2 bits
     circuit.h(0)
@@ -14,7 +14,7 @@ def generate_default_circuit():
     return circuit
 
 
-#test a circuit and later visualize it with a histogram, used for testing purpouses
+#test a circuit and later visualize it with a histogram, used for testing purposes
 def test_circuit(simulator, shots: int = 100, exclude_low_probability_values: bool = True, low_probability_threshold: float = 0.05, circuit = generate_default_circuit()):
     # Submit the job for execution
     print(circuit)
