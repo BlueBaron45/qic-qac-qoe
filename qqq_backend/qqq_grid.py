@@ -1,40 +1,59 @@
-# simulates a simple ttt game without any player input
-import numpy
+from qqq_backend.qqq_block import QQQBlock
+class QQQGrid:
 
-from quantum_evaluators import *
+    def __init__(self, size: int):
+        self.grid = [[QQQBlock() for _ in range(size)] for _ in range(size)]
 
-def simple_ttt_game(simulator, grid_size:int):
-    evaluator = simple_evaulator()
-    result = simulator.run(evaluator, shots=grid_size * grid_size, memory=True).result()
-    # Get measurement counts
-    counts = result.get_memory()
+    def get_grid(self):
+        return self.grid
 
-    # Get individual measurement results
-    results = result.get_memory()
+    def make_standard_move(self, x: int, y: int, player) -> bool:
+        if self.grid[x][y].get_state() != ' ':
+            return False
+        self.grid[x][y].set_state(player)
+        return True
 
-    return [int(bit) for bit in results]
+    def logic(self, winNum: int, character: str) -> bool:
+        board_size = len(self.grid)
 
+        if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
+            raise ValueError("winNum must be between 1 and the board size")
 
-def set_up_rng_circuit(max_value: int) -> QuantumCircuit:
-    circuit = QuantumCircuit(2)
-    if max_value < 1:
-        raise ValueError("max_value must be at least 1")
-    count = max(1, (max_value - 1).bit_length())
-    # Number of basis states available with count qubits
-    state_count = 1 << count
-    # Uniform amplitudes for values 0 through max_value - 1
-    state = ([1 / numpy.sqrt(max_value)] * max_value + [0] * (state_count - max_value))
-    qc = QuantumCircuit(count, count)
-    qubit_list = list(range(count))
-    qc.initialize(state, qubit_list)
-    qc.measure(qubit_list, qubit_list)
-    return qc
+        if character not in ("X", "O", " "):
+            raise ValueError("character must be 'X' or 'O'")
 
-def generate_values_from_rng_circuit(number_of_values, max_value, simulator):
-    result = simulator.run(set_up_rng_circuit(max_value), shots=number_of_values, memory=True).result()
-    counts = result.get_memory()
+        directions = (
+            (0, 1),  # Horizontal
+            (1, 0),  # Vertical
+            (1, 1),  # Diagonal down-right
+            (1, -1),  # Diagonal down-left
+        )
 
-    # Get individual measurement results
-    results = result.get_memory()
+        for row in range(board_size):
+            for column in range(board_size):
+                cell = self.grid[row][column].get_state()
 
-    return [int(bit) for bit in results]
+                if cell != character:
+                    continue
+
+                for row_step, column_step in directions:
+                    end_row = row + (winNum - 1) * row_step
+                    end_column = column + (winNum - 1) * column_step
+
+                    if not (
+                            0 <= end_row < board_size
+                            and 0 <= end_column < board_size
+                    ):
+                        continue
+
+                    if all(
+                            self.grid[
+                                row + step * row_step
+                            ][
+                                column + step * column_step
+                            ].get_state() == character
+                            for step in range(winNum)
+                    ):
+                        return True
+
+        return False
