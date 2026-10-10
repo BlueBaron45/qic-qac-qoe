@@ -1,4 +1,4 @@
-from qqq_game_backend import simple_ttt_game
+from qqq_backend.qqq_grid import simple_ttt_game
 from graphic_interface import grid
 import pyglet
 

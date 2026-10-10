@@ -2,7 +2,6 @@
 
 from quantum_evaluators import *
 
-
 def simple_ttt_game(simulator):
     evaluator = simple_evaulator()
     result = simulator.run(evaluator, shots=9).result()
