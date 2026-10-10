@@ -36,3 +36,10 @@ def generate_values_from_rng_circuit(circuit, shots, simulator):
 
 def binary_to_decimal(binary_values: list[int]) -> list[int]:
     return [int(str(value), 2) for value in binary_values]
+
+
+def generate_parametrized_values_from_circuit(probability, simulator):
+    circuit = simple_parametrized_evaluator(probability)
+    result = simulator.run(circuit,memory=True).result()
+    results = result.get_memory()
+    return int(results[0][0])

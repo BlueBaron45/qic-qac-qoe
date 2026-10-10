@@ -1,5 +1,6 @@
 from qqq_backend import qqq_functions
 from qqq_backend.qqq_grid import QQQGrid
+from qqq_backend.qqq_block import QQQBlock 
 
 
 def game_run(simulator):
@@ -15,17 +16,25 @@ def game_run(simulator):
             job = qqq_functions.generate_values_from_rng_circuit(generator, 2, simulator)
             values = qqq_functions.binary_to_decimal(job)
             move_made = grid.make_standard_move(values[0], values[1], active_player)
-        found_winner = grid.logic(to_win)
+        found_winner = grid.logic(to_win, simulator)
         print()
         print_game(grid)
-        if found_winner == 'X':
-            print(f'winner: {found_winner}')
-        elif found_winner == 'Y':
-            print(f'winner: {found_winner}')
+        evaulate = measure_grid()
+        if evaulate == 'X':
+            print(f'winner: {evaulate}')
+        elif evaulate == 'Y':
+            print(f'winner: {evaulate}')
 
 def print_game(grid:QQQGrid):
     for row in grid.get_grid():
         line = ""
         for cell in row:
             line += str(cell.get_state())
+        for cell in row:
+            line += " |" +str(cell.get_state())
+            line += " X: " + str(cell.tiltA)
+            line += " propability of O: " + str(1 - cell.tiltA)
         print(line)
+
+def measure_grid():
+    return 'x'

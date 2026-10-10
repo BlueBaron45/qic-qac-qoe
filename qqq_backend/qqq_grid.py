@@ -1,4 +1,5 @@
 from qqq_backend.qqq_block import QQQBlock
+from qqq_backend.qqq_functions import generate_parametrized_values_from_circuit
 from quantum_evaluators import simple_parametrized_evaluator
 
 
@@ -16,7 +17,7 @@ class QQQGrid:
         self.grid[x][y].set_state(player)
         return True
 
-    def logic(self, winNum: int):
+    def logic(self, winNum: int, simulator):
         board_size = len(self.grid)
 
         if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
@@ -34,9 +35,11 @@ class QQQGrid:
                 spot = self.grid[row][column]
                 character = spot.get_state()
                 if character == '?':
-                    parameter_circuit = simple_parametrized_evaluator()
-                    #TODO
-
+                    number = generate_parametrized_values_from_circuit(spot.get_tiltA() / (spot.get_tiltA() + spot.get_tiltB()), simulator)
+                    if number == 0 :
+                        character = 'X'
+                    else:
+                        character = 'O'
                 # Skip empty cells
                 if character not in ("X", "O"):
                     continue
