@@ -1,9 +1,12 @@
+import qiskit
 from qiskit import QuantumCircuit
 from qiskit_aer import AerSimulator
 import matplotlib.pyplot as plt
 from qiskit.visualization import plot_histogram
 from qiskit.providers.jobstatus import JobStatus
 import time
+import numpy as np
+from numpy import pi
 
 #default circuit used for testing and debug purpouses
 def generate_default_circuit():
@@ -15,7 +18,7 @@ def generate_default_circuit():
     return circuit
 
 #test a circuit and later visualize it with a histogram, used for testing purpouses
-def test_circuit(shots: int = 100, excludeLowProbabilityValues: bool = True, lowProbabilityThreshold: float = 0.05, circuit = generate_default_circuit()):
+def test_circuit(shots: int = 100, exclude_low_probability_values: bool = True, low_probability_threshold: float = 0.05, circuit = generate_default_circuit()):
     # Submit the job for execution
     print(circuit)
     simulator = AerSimulator()
@@ -35,12 +38,12 @@ def test_circuit(shots: int = 100, excludeLowProbabilityValues: bool = True, low
     # Get measurement counts
     counts = job.result().get_counts()
 
-    if excludeLowProbabilityValues:
-        shotsThreshold = shots * lowProbabilityThreshold
+    if exclude_low_probability_values:
+        shots_threshold = shots * low_probability_threshold
         counts = {
             bits: cnt
             for bits, cnt in counts.items()
-            if cnt > shotsThreshold
+            if cnt > shots_threshold
         }
 
     print(f"Counts for {shots} shots: {counts}")
@@ -49,15 +52,28 @@ def test_circuit(shots: int = 100, excludeLowProbabilityValues: bool = True, low
     plt.show()
 
 #simple evaluator, checks a single spot with equall chances for either one
-def simple_evaulator():
+def simple_evaulator() -> qiskit.QuantumCircuit:
     circuit = QuantumCircuit(1, 1)
     circuit.h(0)
     circuit.measure(0, 0)
     return circuit
 
+#simple evaluator that can take the wanted probability of 0 as input
+#value has to be between 0 and 1
+#some values are not recommended to use here, such as: 0, 1, 0.5 (for this one just use simple_evaluator function)
+def simple_paramitrized_evaluator(chance_for_0: float = 0.5) -> qiskit.QuantumCircuit:
+    if not (0 <= chance_for_0 <= 1):
+        raise ValueError("x must be between 0 and 1 for valid quantum probabilities.")
+    theta = 2 * np.arccos(np.sqrt(chance_for_0))
+    circuit = QuantumCircuit(1, 1)
+    circuit.ry(theta, 0)
+    circuit.measure(0, 0)
+    return circuit
+
+
 # simulates a simple ttt game without any player input
 def simple_ttt_game():
-    evaluator = simple_evaulator()
+    evaluator = simple_paramitrized_evaluator(chance_for_0 = 0.5)
     simulator = AerSimulator()
     result = simulator.run(evaluator, shots=9).result()
     # Get measurement counts
@@ -72,6 +88,7 @@ def simple_ttt_game():
 
 #main method
 if __name__ == "__main__":
-    #testCircuit()
-    #testCircuit(circuit = simple_evaulator())
-    simple_ttt_game()
+    #test_circuit()
+    #test_circuit(circuit = simple_evaulator())
+    #simple_ttt_game()
+    test_circuit(circuit = simple_paramitrized_evaluator(0.9))
