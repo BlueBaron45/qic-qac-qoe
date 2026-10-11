@@ -1,4 +1,3 @@
-from numpy.f2py.auxfuncs import throw_error
 
 
 class QQQBlock:
@@ -6,6 +5,20 @@ class QQQBlock:
         self.state = state
         self.tiltA = 0
         self.tiltB = 0
+        # entanglement link (None when the cell is not entangled)
+        self.partner = None    # (row, column) of the other cell
+        self.relation = None   # 'same' or 'opposite'
+        self.tag = None        # letter shown on the board, e.g. 'a'
+
+        # wave (interference) state: None when the cell is not a wave
+        self.wave_origin = None   # symbol the cell had before it was split
+        self.wave_phase = 0       # hidden number of phase shifts added so far
+
+    def is_entangled(self):
+        return self.partner is not None
+
+    def is_wave(self):
+        return self.wave_origin is not None
 
     def direct_add(self, value):
         if value == 'X':

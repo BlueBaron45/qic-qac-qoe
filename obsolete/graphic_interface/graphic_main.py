@@ -1,5 +1,5 @@
-from qqq_backend.qqq_functions import simple_ttt_game
-from graphic_interface import grid
+from obsolete.qqq_functions import simple_ttt_game
+from obsolete.graphic_interface import grid
 import pyglet
 
 def gameRun():

@@ -1,28 +1,61 @@
-from qqq_backend import qqq_functions
+from qqq_backend.qqq_pool import QuantumBitPool
 from qqq_backend.qqq_grid import QQQGrid
 from qqq_backend.qqq_block import QQQBlock 
-import time
 
 sizeOfGrid = 3
 
 
-def game_run(simulator):
+def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float = 0.15,
+             wave_chance: float = 0.25):
     move_count = 0
     grid = QQQGrid(sizeOfGrid)
     shownGrid = QQQGrid(sizeOfGrid)
     found_winner = False
-    generator = qqq_functions.set_up_rng_circuit(sizeOfGrid)
+    moves_since_measurement = 0
+    measurement_interval = 4
+    pool = QuantumBitPool(backend, n_coins=qubits, shots=shots)  # the ONE quantum job
     print_game(grid)
     active_player = 'X'
     while not found_winner:
-        move_made = False
-        while not move_made:
-            job = qqq_functions.generate_values_from_rng_circuit(generator, 2, simulator)
-            values = qqq_functions.binary_to_decimal(job)
-            move_made = grid.make_standard_move(values[0], values[1], active_player)
-        shownGrid = grid
-        
-        found_winner = grid.logic(sizeOfGrid, simulator)
+        # one quantum number decides what kind of move this turn is
+        roll = pool.random(8)
+        candidates = grid.entangle_candidates()
+        splits, waves = grid.split_candidates(), grid.wave_cells()
+        if roll < entangle_chance and len(candidates) >= 2:
+            a = candidates[pool.randbelow(len(candidates))]
+            others = [c for c in candidates if c != a]
+            b = others[pool.randbelow(len(others))]
+            relation = 'same' if pool.randbelow(2) == 0 else 'opposite'
+            grid.make_entangle_move(a, b, relation)
+            print(f"{active_player} entangles {a} and {b}: they will measure as {relation}")
+        elif roll < entangle_chance + wave_chance and (splits or waves):
+            # while a wave exists, play with it; otherwise create one
+            options = ['phase', 'merge'] if waves else ['split']
+            action = options[pool.randbelow(len(options))]
+            if action == 'split':
+                cell = splits[pool.randbelow(len(splits))]
+                was = grid.get_grid()[cell[0]][cell[1]].get_state()
+                grid.make_split_move(cell)
+                print(f"{active_player} splits {cell} (was {was}) into a wave: H gate")
+            elif action == 'phase':
+                cell = waves[pool.randbelow(len(waves))]
+                grid.add_phase(cell)
+                print(f"{active_player} adds a hidden phase shift to the wave at {cell}: S gate")
+            else:
+                cell = waves[pool.randbelow(len(waves))]
+                symbol, k = grid.merge_wave(cell, pool)
+                print(f"{active_player} merges the wave at {cell} (H gate): it had {k} phase "
+                      f"shift(s) mod 4 and becomes {symbol}")
+        else:
+            move_made = False
+            while not move_made:
+                x = pool.randbelow(sizeOfGrid)
+                y = pool.randbelow(sizeOfGrid)
+                move_made = grid.make_standard_move(x, y, active_player)
+        moves_since_measurement += 1
+        if moves_since_measurement == measurement_interval:
+            found_winner = grid.logic(sizeOfGrid, pool)
+            moves_since_measurement = 0
         print("\n" * 4)
         print_game(grid)
         move_count +=1
@@ -38,11 +71,13 @@ def game_run(simulator):
             print("winner board")
             print(shownGrid)
 
-        if (active_player == 'X'):
-            active_player = 'O'
+        if not found_winner:
+            active_player = 'O' if active_player == 'X' else 'X'
         else:
-            active_player = 'X'
-        #time.sleep(1) 
+            print(f"entangled pairs skipped because noise broke the correlation: "
+                  f"{pool.rejected_pairs}")
+            print(f"wave merges: {pool.interference_draws}, "
+                  f"wrong results from noise on the certain cases: {pool.interference_errors}")
 
 
 def print_game(grid: QQQGrid):
@@ -107,6 +142,13 @@ def print_game(grid: QQQGrid):
             if is_uncertain:
                 # Block out the cell with '#' symbols to represent an uncertain/superposition state
                 art = ("#" * cell_width,) * 6
+                if cell.is_wave():
+                    label = f" wave (was {cell.wave_origin}) "
+                    art = art[:2] + (label.center(cell_width, '#'),) + art[3:]
+                if cell.is_entangled():
+                    sign = '=' if cell.relation == 'same' else '!='
+                    label = f" pair {cell.tag} ({sign}) "
+                    art = art[:2] + (label.center(cell_width, '#'),) + art[3:]
             else:
                 # Pick corresponding ASCII art for 'X', 'O', or empty '-'
                 art = symbol_art.get(state, symbol_art["-"])

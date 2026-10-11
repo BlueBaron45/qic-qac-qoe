@@ -1,21 +1,123 @@
 from qqq_backend.qqq_block import QQQBlock
-from qqq_backend.qqq_functions import generate_parametrized_values_from_circuit
-from quantum_evaluators import simple_parametrized_evaluator
 
 
 class QQQGrid:
 
     def __init__(self, size: int):
         self.grid = [[QQQBlock() for _ in range(size)] for _ in range(size)]
+        self.pair_count = 0
 
     def get_grid(self):
         return self.grid
 
     def make_standard_move(self, x: int, y: int, player) -> bool:
+        # an entangled cell is locked until its pair is measured
+        if self.grid[x][y].is_entangled() or self.grid[x][y].is_wave():
+            return False
         self.grid[x][y].direct_add(player)
         return True
 
-    def logic(self, winNum: int, simulator, getStates = False):
+    def can_entangle(self, a, b) -> bool:
+        if a == b:
+            return False
+        for row, column in (a, b):
+            cell = self.grid[row][column]
+            # only empty or already-uncertain cells, and only if not linked yet
+            if cell.is_entangled() or cell.is_wave() or cell.get_state() in ('X', 'O'):
+                return False
+        return True
+
+    def entangle_candidates(self):
+        """Cells that may still be entangled: empty or uncertain, and not linked."""
+        return [
+            (row, column)
+            for row in range(len(self.grid))
+            for column in range(len(self.grid))
+            if not self.grid[row][column].is_entangled()
+            and not self.grid[row][column].is_wave()
+            and self.grid[row][column].get_state() in ('-', '?')
+        ]
+
+    def make_entangle_move(self, a, b, relation: str) -> bool:
+        """Link two cells instead of placing a symbol.
+        relation 'same'     -> both cells will measure as the same symbol
+        relation 'opposite' -> they will measure as different symbols"""
+        if relation not in ('same', 'opposite') or not self.can_entangle(a, b):
+            return False
+        tag = chr(ord('a') + self.pair_count % 26)
+        self.pair_count += 1
+        for mine, other in ((a, b), (b, a)):
+            cell = self.grid[mine[0]][mine[1]]
+            cell.partner, cell.relation, cell.tag = other, relation, tag
+            cell.set_tiltA(1)      # 50 / 50 until measured
+            cell.set_tiltB(1)
+            cell.set_state('?')
+        return True
+
+    @staticmethod
+    def _make_definite(block, symbol):
+        """Turn a cell into a plain X or O and clear any entanglement / wave data."""
+        block.set_state(symbol)
+        block.set_tiltA(1 if symbol == 'X' else 0)
+        block.set_tiltB(1 if symbol == 'O' else 0)
+        block.partner = block.relation = block.tag = None
+        block.wave_origin = None
+        block.wave_phase = 0
+
+    # ---- interference: wave cells -------------------------------------------------
+    def wave_cells(self):
+        return [(r, c) for r in range(len(self.grid)) for c in range(len(self.grid))
+                if self.grid[r][c].is_wave()]
+
+    def split_candidates(self):
+        """Definite X / O cells that can be split into a wave."""
+        return [(r, c) for r in range(len(self.grid)) for c in range(len(self.grid))
+                if self.grid[r][c].get_state() in ('X', 'O')
+                and not self.grid[r][c].is_entangled()
+                and not self.grid[r][c].is_wave()]
+
+    def make_split_move(self, a) -> bool:
+        """H gate: a definite cell becomes a wave (shown 50 / 50, phase hidden)."""
+        if a not in self.split_candidates():
+            return False
+        cell = self.grid[a[0]][a[1]]
+        cell.wave_origin = cell.get_state()
+        cell.wave_phase = 0
+        cell.set_tiltA(1)
+        cell.set_tiltB(1)
+        cell.set_state('?')
+        return True
+
+    def add_phase(self, a) -> bool:
+        """S gate: add a hidden quarter-turn of phase to a wave."""
+        cell = self.grid[a[0]][a[1]]
+        if not cell.is_wave():
+            return False
+        cell.wave_phase += 1
+        return True
+
+    def merge_wave(self, a, pool):
+        """Second H gate: the wave interferes with itself. Returns (symbol, phase mod 4).
+        0 shifts -> back to the origin symbol, 2 shifts -> flipped, 1 or 3 -> 50 / 50."""
+        cell = self.grid[a[0]][a[1]]
+        k = cell.wave_phase % 4
+        bit = pool.interference_bit(k)     # bit 0 = 'returned to where it started'
+        origin = cell.wave_origin
+        symbol = origin if bit == 0 else ('O' if origin == 'X' else 'X')
+        self._make_definite(cell, symbol)
+        return symbol, k
+
+    def _measure_pair(self, cell, pool):
+        """Measure a Bell pair: one shared quantum bit decides both cells."""
+        partner = self.grid[cell.partner[0]][cell.partner[1]]
+        bit = pool.bell_pair()
+        first = 'X' if bit == 0 else 'O'
+        flipped = 'O' if first == 'X' else 'X'
+        second = first if cell.relation == 'same' else flipped
+        for block, symbol in ((cell, first), (partner, second)):
+            self._make_definite(block, symbol)
+
+    def logic(self, winNum: int, pool):
         board_size = len(self.grid)
     
         if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
@@ -31,7 +133,16 @@ class QQQGrid:
                 spot = self.grid[row][column]
                 character = spot.get_state()
 
-                if character == '?':
+                if character == '?' and spot.is_entangled():
+                    self._measure_pair(spot, pool)
+                    character = spot.get_state()
+
+                elif character == '?' and spot.is_wave():
+                    # never merged: phase can't change a Z measurement, so it is 50 / 50
+                    self._make_definite(spot, 'X' if pool.randbelow(2) == 0 else 'O')
+                    character = spot.get_state()
+
+                elif character == '?':
                     tilt_a = spot.get_tiltA()
                     tilt_b = spot.get_tiltB()
                     total = tilt_a + tilt_b
@@ -43,13 +154,9 @@ class QQQGrid:
 
                     probability = tilt_a / total
 
-                    number = generate_parametrized_values_from_circuit(
-                        probability, simulator
-                    )
-
-                    character = 'X' if number == 0 else 'O'
-                    if getStates == True:
-                        spot.set_state(character)
+                    # quantum coin: X with probability tiltA / (tiltA + tiltB)
+                    character = 'X' if pool.random() < probability else 'O'
+                    spot.set_state(character)
 
                 temp_row.append(character)
 
