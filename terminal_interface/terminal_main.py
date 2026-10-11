@@ -11,8 +11,7 @@ def game_run(simulator):
     grid = QQQGrid(sizeOfGrid)
     found_winner = False
     moves_since_measurement = 0
-    # interval for measuring the grid, after this many moves the grid will be measured and a winner will be checked
-    measurement_interval = 5
+    measurement_interval = 3
     generator = qqq_functions.set_up_rng_circuit(sizeOfGrid)
     print_game(grid)
     active_player = 'X'

@@ -17,7 +17,7 @@ class QQQGrid:
 
     def logic(self, winNum: int, simulator):
         board_size = len(self.grid)
-
+    
         if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
             raise ValueError("winNum must be between 1 and the board size")
 
