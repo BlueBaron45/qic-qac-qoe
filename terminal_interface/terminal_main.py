@@ -1,7 +1,7 @@
+import time
+
 from qqq_backend.qqq_pool import QuantumBitPool
 from qqq_backend.qqq_grid import QQQGrid
-from qqq_backend.qqq_block import QQQBlock 
-from quantum_circuit_testing import test_circuit
 
 sizeOfGrid = 3
 
@@ -28,8 +28,13 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
     while not found_winner:
         # one quantum number decides what kind of move this turn is
         roll = pool.random(8)
-        candidates = grid.entangle_candidates()
-        splits, waves = grid.split_candidates(), grid.wave_cells()
+        made_special_move = False
+
+        if roll < entangle_chance:
+            candidates = grid.entangle_candidates()
+        else:
+            candidates = []
+
         if roll < entangle_chance and len(candidates) >= 2:
             a = candidates[pool.randbelow(len(candidates))]
             others = [c for c in candidates if c != a]
@@ -37,25 +42,32 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
             relation = 'same' if pool.randbelow(2) == 0 else 'opposite'
             grid.make_entangle_move(a, b, relation)
             print(f"{active_player} entangles {a} and {b}: they will measure as {relation}")
-        elif roll < entangle_chance + wave_chance and (splits or waves):
-            # while a wave exists, play with it; otherwise create one
-            options = ['phase', 'merge'] if waves else ['split']
-            action = options[pool.randbelow(len(options))]
-            if action == 'split':
-                cell = splits[pool.randbelow(len(splits))]
-                was = grid.get_grid()[cell[0]][cell[1]].get_state()
-                grid.make_split_move(cell)
-                print(f"{active_player} splits {cell} (was {was}) into a wave: H gate")
-            elif action == 'phase':
-                cell = waves[pool.randbelow(len(waves))]
-                grid.add_phase(cell)
-                print(f"{active_player} adds a hidden phase shift to the wave at {cell}: S gate")
-            else:
-                cell = waves[pool.randbelow(len(waves))]
-                symbol, k = grid.merge_wave(cell, pool)
-                print(f"{active_player} merges the wave at {cell} (H gate): it had {k} phase "
-                      f"shift(s) mod 4 and becomes {symbol}")
-        else:
+            made_special_move = True
+        elif roll < entangle_chance + wave_chance:
+            waves = grid.wave_cells()
+            splits = grid.split_candidates() if not waves else []
+
+            if waves or splits:
+                # while a wave exists, play with it; otherwise create one
+                options = ['phase', 'merge'] if waves else ['split']
+                action = options[pool.randbelow(len(options))]
+                if action == 'split':
+                    cell = splits[pool.randbelow(len(splits))]
+                    was = grid.get_grid()[cell[0]][cell[1]].get_state()
+                    grid.make_split_move(cell)
+                    print(f"{active_player} splits {cell} (was {was}) into a wave: H gate")
+                elif action == 'phase':
+                    cell = waves[pool.randbelow(len(waves))]
+                    grid.add_phase(cell)
+                    print(f"{active_player} adds a hidden phase shift to the wave at {cell}: S gate")
+                else:
+                    cell = waves[pool.randbelow(len(waves))]
+                    symbol, k = grid.merge_wave(cell, pool)
+                    print(f"{active_player} merges the wave at {cell} (H gate): it had {k} phase "
+                          f"shift(s) mod 4 and becomes {symbol}")
+                made_special_move = True
+
+        if not made_special_move:
             move_made = False
             while not move_made:
                 x = pool.randbelow(sizeOfGrid)
@@ -67,6 +79,7 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
             moves_since_measurement = 0
         print("\n" * 4)
         print_game(grid)
+        time.sleep(3)
         move_count +=1
         print("move: ", move_count)
         if found_winner == 'X':
