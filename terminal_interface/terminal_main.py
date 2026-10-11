@@ -4,7 +4,7 @@ from qqq_backend.qqq_pool import QuantumBitPool
 from qqq_backend.qqq_grid import QQQGrid
 from qqq_backend.qqq_block import QQQBlock
 
-sizeOfGrid = 2
+sizeOfGrid = 4
 
 
 def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float = 0.15,
@@ -18,7 +18,6 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
     """
     move_count = 0
     grid = QQQGrid(sizeOfGrid)
-    shownGrid = QQQGrid(sizeOfGrid)
     found_winner = False
     moves_since_measurement = 0
     measurement_interval = 4
@@ -81,6 +80,8 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
                   f"{pool.rejected_pairs}")
             print(f"wave merges: {pool.interference_draws}, "
                   f"wrong results from noise on the certain cases: {pool.interference_errors}")
+
+        time.sleep(2)
 
 
 def print_game(grid: QQQGrid):
