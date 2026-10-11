@@ -15,7 +15,7 @@ class QQQGrid:
         self.grid[x][y].direct_add(player)
         return True
 
-    def logic(self, winNum: int, simulator):
+    def logic(self, winNum: int, simulator, getStates = False):
         board_size = len(self.grid)
     
         if not isinstance(winNum, int) or not 1 <= winNum <= board_size:
@@ -48,7 +48,8 @@ class QQQGrid:
                     )
 
                     character = 'X' if number == 0 else 'O'
-                    #spot.set_state(character)
+                    if getStates == True:
+                        spot.set_state(character)
 
                 temp_row.append(character)
 
@@ -90,3 +91,5 @@ class QQQGrid:
                         return character
 
         return None
+    def statesOnGrid():
+        pass

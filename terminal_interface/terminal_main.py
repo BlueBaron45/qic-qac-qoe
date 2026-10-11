@@ -9,9 +9,8 @@ sizeOfGrid = 3
 def game_run(simulator):
     move_count = 0
     grid = QQQGrid(sizeOfGrid)
+    shownGrid = QQQGrid(sizeOfGrid)
     found_winner = False
-    moves_since_measurement = 0
-    measurement_interval = 3
     generator = qqq_functions.set_up_rng_circuit(sizeOfGrid)
     print_game(grid)
     active_player = 'X'
@@ -21,26 +20,29 @@ def game_run(simulator):
             job = qqq_functions.generate_values_from_rng_circuit(generator, 2, simulator)
             values = qqq_functions.binary_to_decimal(job)
             move_made = grid.make_standard_move(values[0], values[1], active_player)
-        #moves_since_measurement += 1
-        #if moves_since_measurement == measurement_interval:
+        shownGrid = grid
+        
         found_winner = grid.logic(sizeOfGrid, simulator)
-        #    moves_since_measurement = 0
         print("\n" * 4)
         print_game(grid)
         move_count +=1
         print("move: ", move_count)
         if found_winner == 'X':
+            shownGrid.logic(sizeOfGrid, simulator, True)
             print(f'winner: {found_winner}')
+            print("winner board")
+            print(shownGrid)
         elif found_winner == 'O':
+            shownGrid.logic(sizeOfGrid, simulator, True)
             print(f'winner: {found_winner}')
+            print("winner board")
+            print(shownGrid)
 
         if (active_player == 'X'):
             active_player = 'O'
         else:
             active_player = 'X'
-        #if not found_winner:
-        #    active_player = 'O' if active_player == 'X' else 'X'
-        time.sleep(1) 
+        #time.sleep(1) 
 
 
 def print_game(grid: QQQGrid):
