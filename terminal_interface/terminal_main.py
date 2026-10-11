@@ -1,14 +1,24 @@
+import time
+
 from qqq_backend.qqq_pool import QuantumBitPool
 from qqq_backend.qqq_grid import QQQGrid
-from qqq_backend.qqq_block import QQQBlock 
+from qqq_backend.qqq_block import QQQBlock
 
 sizeOfGrid = 2
 
 
 def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float = 0.15,
              wave_chance: float = 0.25):
+    """Run the quantum tic-tac-toe game until a winner is found.
+
+    Each turn uses the quantum pool to choose between an entanglement move,
+    a wave operation, or a standard X/O move. The board is measured every
+    few moves to check for a winner, then displayed along with move and
+    noise statistics.
+    """
     move_count = 0
     grid = QQQGrid(sizeOfGrid)
+    shownGrid = QQQGrid(sizeOfGrid)
     found_winner = False
     moves_since_measurement = 0
     measurement_interval = 4
@@ -18,8 +28,13 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
     while not found_winner:
         # one quantum number decides what kind of move this turn is
         roll = pool.random(8)
-        candidates = grid.entangle_candidates()
-        splits, waves = grid.split_candidates(), grid.wave_cells()
+        made_special_move = False
+
+        if roll < entangle_chance:
+            candidates = grid.entangle_candidates()
+        else:
+            candidates = []
+
         if roll < entangle_chance and len(candidates) >= 2:
             a = candidates[pool.randbelow(len(candidates))]
             others = [c for c in candidates if c != a]
@@ -73,11 +88,11 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
 
         if not found_winner:
             active_player = 'O' if active_player == 'X' else 'X'
-
-    print(f"entangled pairs skipped because noise broke the correlation: "
-          f"{pool.rejected_pairs}")
-    print(f"wave merges: {pool.interference_draws}, "
-          f"wrong results from noise on the certain cases: {pool.interference_errors}")
+        else:
+            print(f"entangled pairs skipped because noise broke the correlation: "
+                  f"{pool.rejected_pairs}")
+            print(f"wave merges: {pool.interference_draws}, "
+                  f"wrong results from noise on the certain cases: {pool.interference_errors}")
 
 
 def print_game(grid: QQQGrid):
