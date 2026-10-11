@@ -1,6 +1,7 @@
 from qqq_backend.qqq_pool import QuantumBitPool
 from qqq_backend.qqq_grid import QQQGrid
 from qqq_backend.qqq_block import QQQBlock 
+from quantum_circuit_testing import test_circuit
 
 sizeOfGrid = 3
 
@@ -21,6 +22,7 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
     moves_since_measurement = 0
     measurement_interval = 4
     pool = QuantumBitPool(backend, n_coins=qubits, shots=shots)  # the ONE quantum job
+    #test_circuit(backend, circuit=pool.getCiruit())
     print_game(grid)
     active_player = 'X'
     while not found_winner:

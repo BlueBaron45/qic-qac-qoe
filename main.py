@@ -1,6 +1,7 @@
 from qiskit_aer import AerSimulator
 
 from terminal_interface.terminal_main import game_run
+from quantum_circuit_testing import test_circuit
 
 
 # Arguments show up under "Run settings" on Qollab.
