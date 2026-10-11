@@ -1,28 +1,18 @@
 from qqq_backend.qqq_pool import QuantumBitPool
 from qqq_backend.qqq_grid import QQQGrid
 from qqq_backend.qqq_block import QQQBlock 
-from quantum_circuit_testing import test_circuit
 
 sizeOfGrid = 2
 
 
 def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float = 0.15,
              wave_chance: float = 0.25):
-    """Run the quantum tic-tac-toe game until a winner is found.
-
-    Each turn uses the quantum pool to choose between an entanglement move,
-    a wave operation, or a standard X/O move. The board is measured every
-    few moves to check for a winner, then displayed along with move and
-    noise statistics.
-    """
     move_count = 0
     grid = QQQGrid(sizeOfGrid)
-    shownGrid = QQQGrid(sizeOfGrid)
     found_winner = False
     moves_since_measurement = 0
     measurement_interval = 4
     pool = QuantumBitPool(backend, n_coins=qubits, shots=shots)  # the ONE quantum job
-    #test_circuit(backend, circuit=pool.getCiruit())
     print_game(grid)
     active_player = 'X'
     while not found_winner:
@@ -56,11 +46,18 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
                 print(f"{active_player} merges the wave at {cell} (H gate): it had {k} phase "
                       f"shift(s) mod 4 and becomes {symbol}")
         else:
-            move_made = False
-            while not move_made:
-                x = pool.randbelow(sizeOfGrid)
-                y = pool.randbelow(sizeOfGrid)
-                move_made = grid.make_standard_move(x, y, active_player)
+            free = grid.unlocked_cells()
+            if not free:
+                # every cell is entangled or a wave: nothing to place, so measure the board
+                print("Every cell is locked: measuring the board")
+                found_winner = grid.logic(sizeOfGrid, pool)
+                moves_since_measurement = 0
+                print_game(grid)
+                if found_winner:
+                    print(f'winner: {found_winner}')
+                continue
+            x, y = free[pool.randbelow(len(free))]
+            grid.make_standard_move(x, y, active_player)
         moves_since_measurement += 1
         if moves_since_measurement == measurement_interval:
             found_winner = grid.logic(sizeOfGrid, pool)
@@ -76,11 +73,11 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
 
         if not found_winner:
             active_player = 'O' if active_player == 'X' else 'X'
-        else:
-            print(f"entangled pairs skipped because noise broke the correlation: "
-                  f"{pool.rejected_pairs}")
-            print(f"wave merges: {pool.interference_draws}, "
-                  f"wrong results from noise on the certain cases: {pool.interference_errors}")
+
+    print(f"entangled pairs skipped because noise broke the correlation: "
+          f"{pool.rejected_pairs}")
+    print(f"wave merges: {pool.interference_draws}, "
+          f"wrong results from noise on the certain cases: {pool.interference_errors}")
 
 
 def print_game(grid: QQQGrid):

@@ -14,55 +14,32 @@ and hand the measured results out during the game. Every shot contains
 import random
 from qiskit import QuantumCircuit
 
-def generate_bit_pool_circuit(n_coins: int = 8, shots: int = 512, bell_pairs: int = 1):
-    base = n_coins + 2 * bell_pairs  # first interference qubit
-    n = base + 4
-    qc = QuantumCircuit(n, n)
-    qc.h(range(n_coins))
-    for k in range(bell_pairs):
-        a = n_coins + 2 * k
-        qc.h(a)
-        qc.cx(a, a + 1)  # entangle qubit a with a + 1
-    for k in range(4):
-        q = base + k
-        qc.h(q)
-        qc.barrier(q)  # stop the compiler cancelling H...H
-        if k == 1:
-            qc.s(q)  # +90 degrees of phase
-        elif k == 2:
-            qc.z(q)  # 180 degrees (= two S gates)
-        elif k == 3:
-            qc.sdg(q)  # 270 degrees (= three S gates)
-        qc.barrier(q)
-        qc.h(q)
-    qc.measure(range(n), range(n))
-    return qc
 
 class QuantumBitPool:
     def __init__(self, backend, n_coins: int = 8, shots: int = 512, bell_pairs: int = 1):
         base = n_coins + 2 * bell_pairs          # first interference qubit
         n = base + 4
-        self.qc = QuantumCircuit(n, n)
-        self.qc.h(range(n_coins))
+        qc = QuantumCircuit(n, n)
+        qc.h(range(n_coins))
         for k in range(bell_pairs):
             a = n_coins + 2 * k
-            self.qc.h(a)
-            self.qc.cx(a, a + 1)                      # entangle qubit a with a + 1
+            qc.h(a)
+            qc.cx(a, a + 1)                      # entangle qubit a with a + 1
         for k in range(4):
             q = base + k
-            self.qc.h(q)
-            self.qc.barrier(q)                        # stop the compiler cancelling H...H
+            qc.h(q)
+            qc.barrier(q)                        # stop the compiler cancelling H...H
             if k == 1:
-                self.qc.s(q)                          # +90 degrees of phase
+                qc.s(q)                          # +90 degrees of phase
             elif k == 2:
-                self.qc.z(q)                          # 180 degrees (= two S gates)
+                qc.z(q)                          # 180 degrees (= two S gates)
             elif k == 3:
-                self.qc.sdg(q)                        # 270 degrees (= three S gates)
-            self.qc.barrier(q)
-            self.qc.h(q)
-        self.qc.measure(range(n), range(n))
+                qc.sdg(q)                        # 270 degrees (= three S gates)
+            qc.barrier(q)
+            qc.h(q)
+        qc.measure(range(n), range(n))
 
-        result = backend.run(self.qc, shots=shots, memory=True).result()
+        result = backend.run(qc, shots=shots, memory=True).result()
         try:
             words = result.get_memory()          # one bitstring per shot, in order
         except Exception:
@@ -90,10 +67,6 @@ class QuantumBitPool:
         self.interference_errors = 0             # k=0 / k=2 results that broke the ideal answer
         print(f"Quantum pool ready: {len(self.bits)} coin bits, {len(self.pairs)} "
               f"entangled pairs and {len(words)} interference runs from {backend} ({n} qubits)")
-        
-    def getCiruit(self):
-       return self.qc
-    
 
     # ---- plain random numbers -------------------------------------------------
     def _take(self, k: int) -> int:
@@ -143,4 +116,3 @@ class QuantumBitPool:
         if (k == 0 and bit == 1) or (k == 2 and bit == 0):
             self.interference_errors += 1
         return bit
-    

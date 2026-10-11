@@ -17,6 +17,11 @@ class QQQGrid:
         self.grid[x][y].direct_add(player)
         return True
 
+    def unlocked_cells(self):
+        """Cells a normal move may use (not entangled, not a wave)."""
+        return [(r, c) for r in range(len(self.grid)) for c in range(len(self.grid))
+                if not self.grid[r][c].is_entangled() and not self.grid[r][c].is_wave()]
+
     def can_entangle(self, a, b) -> bool:
         if a == b:
             return False
@@ -198,5 +203,3 @@ class QQQGrid:
                         return character
 
         return None
-    def statesOnGrid():
-        pass
