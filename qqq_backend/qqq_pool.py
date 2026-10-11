@@ -12,7 +12,7 @@ and hand the measured results out during the game. Every shot contains
     always 1 (k=2), 50% (k=3). Used by the wave-cell "merge" move.
 """
 import random
-from qiskit import QuantumCircuit, transpile
+from qiskit import QuantumCircuit
 
 def generate_bit_pool_circuit(n_coins: int = 8, shots: int = 512, bell_pairs: int = 1):
     base = n_coins + 2 * bell_pairs  # first interference qubit
@@ -62,7 +62,6 @@ class QuantumBitPool:
             self.qc.h(q)
         self.qc.measure(range(n), range(n))
 
-        self.qc = transpile(self.qc, backend, optimization_level=3)
         result = backend.run(self.qc, shots=shots, memory=True).result()
         try:
             words = result.get_memory()          # one bitstring per shot, in order

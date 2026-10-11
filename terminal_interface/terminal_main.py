@@ -3,7 +3,7 @@ from qqq_backend.qqq_grid import QQQGrid
 from qqq_backend.qqq_block import QQQBlock 
 from quantum_circuit_testing import test_circuit
 
-sizeOfGrid = 3
+sizeOfGrid = 2
 
 
 def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float = 0.15,
