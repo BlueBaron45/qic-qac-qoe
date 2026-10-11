@@ -14,6 +14,29 @@ and hand the measured results out during the game. Every shot contains
 import random
 from qiskit import QuantumCircuit
 
+def generate_bit_pool_circuit(n_coins: int = 8, shots: int = 512, bell_pairs: int = 1):
+    base = n_coins + 2 * bell_pairs  # first interference qubit
+    n = base + 4
+    qc = QuantumCircuit(n, n)
+    qc.h(range(n_coins))
+    for k in range(bell_pairs):
+        a = n_coins + 2 * k
+        qc.h(a)
+        qc.cx(a, a + 1)  # entangle qubit a with a + 1
+    for k in range(4):
+        q = base + k
+        qc.h(q)
+        qc.barrier(q)  # stop the compiler cancelling H...H
+        if k == 1:
+            qc.s(q)  # +90 degrees of phase
+        elif k == 2:
+            qc.z(q)  # 180 degrees (= two S gates)
+        elif k == 3:
+            qc.sdg(q)  # 270 degrees (= three S gates)
+        qc.barrier(q)
+        qc.h(q)
+    qc.measure(range(n), range(n))
+    return qc
 
 class QuantumBitPool:
     def __init__(self, backend, n_coins: int = 8, shots: int = 512, bell_pairs: int = 1):
