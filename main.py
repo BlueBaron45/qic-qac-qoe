@@ -21,4 +21,10 @@ def main(simulator, shots, qubits: int, entangle_chance: float , wave_chance: fl
 
 if __name__ == "__main__":
     backend = AerSimulator()
-    main(backend, shots=192, qubits=2, entangle_chance=0.1, wave_chance=0.1)
+    main(
+        backend,
+        shots=512,
+        qubits=2,
+        entangle_chance=0.1,
+        wave_chance=0.1
+    )
