@@ -7,6 +7,13 @@ sizeOfGrid = 3
 
 def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float = 0.15,
              wave_chance: float = 0.25):
+    """Run the quantum tic-tac-toe game until a winner is found.
+
+    Each turn uses the quantum pool to choose between an entanglement move,
+    a wave operation, or a standard X/O move. The board is measured every
+    few moves to check for a winner, then displayed along with move and
+    noise statistics.
+    """
     move_count = 0
     grid = QQQGrid(sizeOfGrid)
     shownGrid = QQQGrid(sizeOfGrid)

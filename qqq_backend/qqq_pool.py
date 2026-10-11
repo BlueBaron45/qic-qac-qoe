@@ -12,7 +12,7 @@ and hand the measured results out during the game. Every shot contains
     always 1 (k=2), 50% (k=3). Used by the wave-cell "merge" move.
 """
 import random
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
 
 
 class QuantumBitPool:
@@ -39,6 +39,7 @@ class QuantumBitPool:
             qc.h(q)
         qc.measure(range(n), range(n))
 
+        qc = transpile(qc, backend, optimization_level=3)
         result = backend.run(qc, shots=shots, memory=True).result()
         try:
             words = result.get_memory()          # one bitstring per shot, in order
