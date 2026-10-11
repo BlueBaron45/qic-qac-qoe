@@ -61,15 +61,9 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
         move_count +=1
         print("move: ", move_count)
         if found_winner == 'X':
-            shownGrid.logic(sizeOfGrid, simulator, True)
             print(f'winner: {found_winner}')
-            print("winner board")
-            print(shownGrid)
         elif found_winner == 'O':
-            shownGrid.logic(sizeOfGrid, simulator, True)
             print(f'winner: {found_winner}')
-            print("winner board")
-            print(shownGrid)
 
         if not found_winner:
             active_player = 'O' if active_player == 'X' else 'X'
