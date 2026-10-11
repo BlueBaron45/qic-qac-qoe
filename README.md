@@ -1,65 +1,58 @@
 # Quantum QQQ
 
-A small experimental Python project that turns a classic tic-tac-toe board into a quantum-inspired game. The game uses a single compiled Qiskit circuit to generate random coin flips, Bell-pair correlations, and interference-based wave effects, then applies those quantum outcomes to a 3x3 board.
+Quantum QQQ is a small experimental terminal game that blends classic board-play with quantum-inspired mechanics. The project uses a single Qiskit circuit to generate reusable random coin bits, Bell-pair correlations, and phase-interference outcomes, then applies those results to a game board.
 
-This repo is a prototype for exploring how quantum randomness, entanglement, and phase interference can influence a turn-based board game. It is built with Qiskit and runs locally with the Aer simulator by default.
+This repository is a local prototype and is intentionally lightweight: it runs from the terminal, uses Qiskit Aer for simulation, and focuses on exploring how randomness, entanglement, and wave interference can affect turns and outcomes in a board game.
 
-## Project overview
+## What the project does
 
-The project blends three ideas:
+The game creates a 4x4 board and each turn can do one of three things:
 
-- Quantum coin tosses determine random moves and probabilities
-- Entangled cells link two board positions so they measure consistently
-- Wave cells split, phase-shift, and merge using interference behavior
+- place a standard X/O move on an empty cell
+- entangle two valid cells so they resolve together as a correlated pair
+- split, phase-shift, and merge a wave cell to simulate interference behavior
 
-The game loop is implemented in [terminal_interface/terminal_main.py](terminal_interface/terminal_main.py), while the underlying board logic and quantum resource pool live in [qqq_backend](qqq_backend).
+The board is measured periodically, and the game checks for a winner using the current board rules in [qqq_backend/qqq_grid.py](qqq_backend/qqq_grid.py).
 
-## Features
+## Current implementation
 
-- 3x3 quantum tic-tac-toe board
-- Standard X/O placements on empty cells
-- Entanglement move between two valid empty or uncertain cells
-- Split/merge wave mechanic using hidden phase states
-- Randomized board measurement with quantum probability display
-- Local simulation using Qiskit Aer
-- Debug/testing utilities for quantum circuits and histogram inspection
+The active code is centered around these files:
 
-## Repository structure
+- [main.py](main.py) — program entry point; creates the Aer simulator and starts a single game session
+- [terminal_interface/terminal_main.py](terminal_interface/terminal_main.py) — game loop, random move selection, ASCII rendering, and board measurement flow
+- [qqq_backend/qqq_pool.py](qqq_backend/qqq_pool.py) — builds the quantum circuit once, stores measured results, and exposes random/entangled/interference values to the game
+- [qqq_backend/qqq_grid.py](qqq_backend/qqq_grid.py) — board state, move validation, entanglement rules, wave mechanics, and win detection
+- [qqq_backend/qqq_block.py](qqq_backend/qqq_block.py) — per-cell state and quantum metadata such as tilt, pair tags, and wave phase
+- [quantum_circuit_testing.py](quantum_circuit_testing.py) — debugging utilities for circuit inspection and experiments
+- [obsolete](obsolete) — older prototype code kept out of the current runtime path
 
-- [main.py](main.py) — entry point; creates the simulator and starts the game
-- [terminal_interface/terminal_main.py](terminal_interface/terminal_main.py) — main game loop and ASCII board renderer
-- [qqq_backend/qqq_pool.py](qqq_backend/qqq_pool.py) — quantum bit pool and random-source abstraction
-- [qqq_backend/qqq_grid.py](qqq_backend/qqq_grid.py) — board mechanics, winning logic, entanglement, and wave rules
-- [qqq_backend/qqq_block.py](qqq_backend/qqq_block.py) — cell state and quantum tilt tracking
-- [quantum_circuit_testing.py](quantum_circuit_testing.py) — helper utilities for circuit testing and visualization
-- [obsolete](obsolete) — older, experimental code not used by the active game
+## Game rules and behavior
 
-## How the game works
+The current terminal version uses a 4x4 grid rather than a classic 3x3 board. The game flow in [terminal_interface/terminal_main.py](terminal_interface/terminal_main.py) is:
 
-The game creates one quantum circuit that contains:
+1. create a single `QuantumBitPool` from one Qiskit circuit
+2. choose a random move type each tick
+3. apply a special move when eligible, otherwise place a standard move
+4. measure the board every 4 turns
+5. continue until a winning line is found
 
-1. Coin qubits for fair random numbers
-2. Bell-pair qubits for entanglement between cells
-3. Interference qubits for wave/phase operations
+The quantum pool includes:
 
-Each turn, the game draws from that generated quantum pool:
+- fair coin bits for random move selection and probability estimates
+- Bell-pair data for entangled-cell relationships
+- 4 interference outcomes used by wave-cell merges
 
-- Random value decides whether to place a move, split a wave, or entangle cells
-- Entangled cells are linked and later resolve into consistent X/O outcomes
-- Wave cells can be split into a superposition, phase-shifted, and merged back into a definite symbol
-- Board checks run periodically and winners are detected using the standard aligned-line logic
-
-The turn-by-turn visual output prints an ASCII board along with per-cell probability estimates for X and O.
+The board prints an ASCII layout and shows estimated X/O probabilities for each cell, so the terminal output reveals the quantum-inspired state even before a cell resolves definitively.
 
 ## Installation
 
-The project is Python-based and requires Qiskit dependencies.
+This project is Python-based and uses Qiskit plus the Aer simulator.
 
 ```bash
 python -m venv .venv
 # Windows PowerShell
 .\.venv\Scripts\Activate.ps1
-# Linux/macOS
+# macOS/Linux
 # source .venv/bin/activate
 
 pip install qiskit qiskit-aer
@@ -67,47 +60,48 @@ pip install qiskit qiskit-aer
 
 ## Run the game
 
-From the project root:
+From the repository root:
 
 ```bash
 python main.py
 ```
 
-The default script starts the simulator and runs the game with:
-
-- 4 qubits
-- 256 shots
-- 10% entanglement chance
-- 10% wave chance
-
-These values are defined in [main.py](main.py) and can be adjusted directly.
-
-## Main configuration
-
-The entry point exposes a function that accepts simulator, shots, qubits, entangle_chance, and wave_chance:
+The default configuration in [main.py](main.py) is:
 
 ```python
-main(simulator=backend, qubits=4, shots=256, entangle_chance=0.1, wave_chance=0.1)
+backend = AerSimulator()
+main(
+    backend,
+    shots=512,
+    qubits=2,
+    entangle_chance=0.1,
+    wave_chance=0.1,
+)
 ```
 
-You can tweak these parameters to change the game behavior and the volume of quantum randomness generated per run.
+That means the game currently starts with:
 
-## Notes on the implementation
+- 512 shots per quantum run
+- 2 coin qubits for the random source
+- 10% entanglement chance per turn window
+- 10% wave chance per turn window
 
-This is an experimental amusement project rather than a polished game engine. Some parts of the code intentionally model quantum behavior with simplified rules and statistical outcomes rather than exact, fully hardware-faithful semantics.
+The terminal loop also fixes the board size to 4 and checks for a result every 4 moves.
 
-The core mechanics are:
+## Configuration notes
 
-- `QuantumBitPool` creates a reusable quantum source for random decisions
-- `QQQGrid` manages board state and move validation
-- `QQQBlock` tracks each cell's state, tilt, entanglement, and wave metadata
+The `main()` function accepts the simulator, shot count, coin qubit count, entanglement chance, and wave chance. These parameters can be adjusted directly in [main.py](main.py) to change the behavior and randomness profile of a run.
+
+## Project status
+
+This repository is best understood as a research-style game prototype rather than a packaged application. It focuses on experimentation and local simulation, and some parts of the implementation intentionally model quantum ideas with simplified statistical behavior instead of exact hardware-level semantics.
 
 ## Troubleshooting
 
-- If Qiskit imports fail, reinstall the required dependencies with `pip install qiskit qiskit-aer`
-- If the game exits early, confirm the simulator backend is available and that the environment is using the intended Python interpreter
-- For circuit testing and experimentation, use the helper functions in [quantum_circuit_testing.py](quantum_circuit_testing.py)
+- If Qiskit import errors appear, reinstall the required packages with `pip install qiskit qiskit-aer`.
+- If the game exits early, confirm that the selected Python environment has both `qiskit` and `qiskit-aer` available.
+- For circuit-level experimentation, inspect [quantum_circuit_testing.py](quantum_circuit_testing.py) and the logic in [qqq_backend/qqq_pool.py](qqq_backend/qqq_pool.py).
 
 ## License
 
-This project does not currently declare a formal license file. Check the repository settings or upstream project context before redistribution or reuse.
+This repository does not currently include a formal license file. If you plan to redistribute or reuse the code, confirm the licensing expectations with the project owner or repository context before doing so.
