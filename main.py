@@ -1,6 +1,7 @@
 from qiskit import transpile
 
 from quantum_circuit_testing import test_circuit
+from quantum_circuit_testing import entaglement_test
 from quantum_evaluators import simple_pair_entangled_evaluator
 from terminal_interface.terminal_main import game_run
 
@@ -11,5 +12,7 @@ from qiskit_aer import AerSimulator
 if __name__ == "__main__":
     simulator = AerSimulator()
     game_run(simulator)
+    #entaglement_test(simulator)
+    
     #test_circuit(simulator=simulator, circuit=simple_pair_entangled_evaluator(False))
     

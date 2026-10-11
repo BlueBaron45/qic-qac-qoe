@@ -46,3 +46,23 @@ def test_circuit(simulator, shots: int = 100, exclude_low_probability_values: bo
     # Display the result distribution
     plot_histogram(counts, title=f"Bell State Distribution ({shots} shots)")
     plt.show()
+    
+def entaglement_test(simulator):
+    # 1. Create a circuit with 2 qubits and 2 classical bits
+    qc = QuantumCircuit(2, 2)
+
+    # 2. Put Qubit 0 into superposition
+    qc.h(0)
+
+    # 3. Entangle Qubit 0 and Qubit 1
+    qc.cx(0, 1)
+
+    # 4. Measure both qubits into classical bits
+    qc.measure([0, 1], [0, 1])
+
+    # 5. Simulate the circuit
+    job = simulator.run(qc, shots=1000)
+    result = job.result()
+    counts = result.get_counts()
+
+    print("Measurement outcomes:", counts)

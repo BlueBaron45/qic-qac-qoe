@@ -48,7 +48,7 @@ class QQQGrid:
                     )
 
                     character = 'X' if number == 0 else 'O'
-                    spot.set_state(character)
+                    #spot.set_state(character)
 
                 temp_row.append(character)
 
