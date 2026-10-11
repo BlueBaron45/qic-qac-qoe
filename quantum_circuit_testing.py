@@ -43,9 +43,12 @@ def test_circuit(simulator, shots: int = 100, exclude_low_probability_values: bo
         }
 
     print(f"Counts for {shots} shots: {counts}")
-    # Display the result distribution
-    plot_histogram(counts, title=f"Bell State Distribution ({shots} shots)")
-    plt.show()
+    if len(counts) > 0:
+        # Display the result distribution
+        plot_histogram(counts, title=f"Bell State Distribution ({shots} shots)")
+        plt.show()
+    else:
+        print("No results generated with set threshold.")
     
 def entaglement_test(simulator):
     # 1. Create a circuit with 2 qubits and 2 classical bits

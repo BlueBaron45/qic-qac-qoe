@@ -198,3 +198,5 @@ class QQQGrid:
                         return character
 
         return None
+    def statesOnGrid():
+        pass
