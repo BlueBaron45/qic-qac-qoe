@@ -2,8 +2,6 @@ import time
 
 from qqq_backend.qqq_pool import QuantumBitPool
 from qqq_backend.qqq_grid import QQQGrid
-from qqq_backend.qqq_block import QQQBlock 
-from quantum_circuit_testing import test_circuit
 
 sizeOfGrid = 3
 
