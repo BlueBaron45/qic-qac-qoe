@@ -47,6 +47,7 @@ class QuantumBitPool:
 
         result = backend.run(qc, shots=shots, memory=True).result()
 
+
 class QuantumBitPool:
     """Store one quantum job and expose random values to the game engine.
 
@@ -87,8 +88,6 @@ class QuantumBitPool:
             self.qc.barrier(q)
             self.qc.h(q)
         self.qc.measure(range(n), range(n))
-
-        self.qc = transpile(self.qc, backend, optimization_level=3)
         result = backend.run(self.qc, shots=shots, memory=True).result()
         try:
             words = result.get_memory()          # one bitstring per shot, in order

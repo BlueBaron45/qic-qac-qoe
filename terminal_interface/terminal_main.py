@@ -28,13 +28,8 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
     while not found_winner:
         # one quantum number decides what kind of move this turn is
         roll = pool.random(8)
-        made_special_move = False
-
-        if roll < entangle_chance:
-            candidates = grid.entangle_candidates()
-        else:
-            candidates = []
-
+        candidates = grid.entangle_candidates()
+        splits, waves = grid.split_candidates(), grid.wave_cells()
         if roll < entangle_chance and len(candidates) >= 2:
             a = candidates[pool.randbelow(len(candidates))]
             others = [c for c in candidates if c != a]
@@ -61,25 +56,18 @@ def game_run(backend, shots: int = 512, qubits: int = 8, entangle_chance: float 
                 print(f"{active_player} merges the wave at {cell} (H gate): it had {k} phase "
                       f"shift(s) mod 4 and becomes {symbol}")
         else:
-            free = grid.unlocked_cells()
-            if not free:
-                # every cell is entangled or a wave: nothing to place, so measure the board
-                print("Every cell is locked: measuring the board")
-                found_winner = grid.logic(sizeOfGrid, pool)
-                moves_since_measurement = 0
-                print_game(grid)
-                if found_winner:
-                    print(f'winner: {found_winner}')
-                continue
-            x, y = free[pool.randbelow(len(free))]
-            grid.make_standard_move(x, y, active_player)
+            move_made = False
+            while not move_made:
+                x = pool.randbelow(sizeOfGrid)
+                y = pool.randbelow(sizeOfGrid)
+                move_made = grid.make_standard_move(x, y, active_player)
         moves_since_measurement += 1
         if moves_since_measurement == measurement_interval:
             found_winner = grid.logic(sizeOfGrid, pool)
             moves_since_measurement = 0
         print("\n" * 4)
         print_game(grid)
-        move_count +=1
+        move_count += 1
         print("move: ", move_count)
         if found_winner == 'X':
             print(f'winner: {found_winner}')
